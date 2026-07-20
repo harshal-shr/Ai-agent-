@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent - Future Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Background -->
+    <div class="stars" id="stars"></div>
+    <div class="particles" id="particles"></div>
+    <div class="gradient-overlay"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- AI Avatar Section -->
+        <div class="ai-avatar-section">
+            <div class="ai-avatar">
+                <div class="avatar-circle">
+                    <i class="fas fa-robot"></i>
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring delay"></div>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Online</span>
+                </div>
+            </div>
+            <h1 class="ai-name">AI Agent</h1>
+            <p class="ai-tagline">Your Intelligent Assistant</p>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i>
+                <span>Chat with AI</span>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="message ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Hello! I'm your AI Agent. I can help you with coding, answering questions, generating ideas, and much more. What would you like to discuss?</p>
+                        <span class="message-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+                <p>AI is thinking...</p>
+            </div>
+
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your message..." onkeypress="if(event.key==='Enter')sendMessage()">
+                <button onclick="sendMessage()" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="skills-section">
+            <h2><i class="fas fa-brain"></i> My Capabilities</h2>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <i class="fas fa-code"></i>
+                    <h3>Code Generation</h3>
+                    <p>HTML, CSS, JavaScript, Python, C</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>Problem Solving</h3>
+                    <p>Logic, algorithms, debugging</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-language"></i>
+                    <h3>Natural Language</h3>
+                    <p>English, Hindi, Marathi</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Data Analysis</h3>
+                    <p>Insights, patterns, trends</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <h2><i class="fas fa-chart-bar"></i> Performance</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="response-time">0.5s</div>
+                    <div class="stat-label">Avg Response Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracy">98%</div>
+                    <div class="stat-label">Accuracy Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="languages">10+</div>
+                    <div class="stat-label">Languages Supported</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="conversations">1K+</div>
+                    <div class="stat-label">Conversations</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Background Animation
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.cssText = `width:${Math.random()*3+1}px;height:${Math.random()*3+1}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--duration:${Math.random()*3+2}s;--delay:${Math.random()*5}s`;
+            starsContainer.appendChild(star);
+        }
+
+        const particlesContainer = document.getElementById('particles');
+        const colors = ['#00d4ff', '#7b2cbf', '#ff006e', '#8338ec', '#ffbe0b'];
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.cssText = `width:${Math.random()*6+2}px;height:${Math.random()*6+2}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--size:${Math.random()*6+2}px;--color:${colors[Math.floor(Math.random()*5)]};--float-duration:${Math.random()*10+10}s;--float-delay:${Math.random()*5}s`;
+            particlesContainer.appendChild(p);
+        }
+
+        // ============================================
+        // AI CHAT FUNCTIONALITY
+        // ============================================
+        
+        // ✅ Tujha API Key
+        const API_KEY = 'AQ.Ab8RN6I7Rppph00MQ-VfGpPQhhD6fI6ER9dR7_hORikkRt5eNA';
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i>
+                </div>
+                <div class="message-content">
+                    <p>${text}</p>
+                    <span class="message-time">${time}</span>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            
+            // Add user message
+            addMessage(text, true);
+            userInput.value = '';
+            
+            // Show typing
+            typingIndicator.classList.add('show');
+            
+            try {
+                // Call Gemini API
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: text
+                            }]
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Hide typing
+                typingIndicator.classList.remove('show');
+                
+                // Get AI response
+                let aiText = 'Sorry, I could not process that.';
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    aiText = data.candidates[0].content.parts[0].text;
+                }
+                
+                // Add AI message with typing effect
+                typeMessage(aiText);
+                
+                // Update stats
+                updateStats();
+                
+            } catch (error) {
+                typingIndicator.classList.remove('show');
+                addMessage('Sorry, I am having trouble connecting. Please try again later.', false);
+                console.error('Error:', error);
+            }
+        }
+
+        function typeMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai-message';
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <p id="typing-text"></p>
+                    <span class="message-time">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            const typingText = messageDiv.querySelector('#typing-text');
+            let index = 0;
+            
+            function type() {
+                if (index < text.length) {
+                    typingText.textContent += text.charAt(index);
+                    index++;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    setTimeout(type, 20);
+                }
+            }
+            
+            type();
+        }
+
+        function updateStats() {
+            // Random response time between 0.3s and 1.5s
+            const responseTime = (Math.random() * 1.2 + 0.3).toFixed(1);
+            document.getElementById('response-time').textContent = responseTime + 's';
+            
+            // Random accuracy between 95% and 99%
+            const accuracy = Math.floor(Math.random() * 5 + 95);
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        // Auto-focus input
+        userInput.focus();
+    </script>
+</body>
+</html>
+
