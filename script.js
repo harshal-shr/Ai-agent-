@@ -2,8 +2,8 @@
 // AI CHAT WITH REAL API (Gemini)
 // ============================================
 
-const API_KEY = 'AQ.Ab8RN6JWKlV49yZL-rAkmOB7NIj0dmyyO-rxMBVWrchP7iBvSA';
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const API_KEY = 'AQ.Ab8RN6IA8gJcVwwzXUYRxCObqCXo9VU_PNEGhq0hyf3Z3F21aA';
+
 
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
